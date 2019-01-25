@@ -1,4 +1,4 @@
-# The All new things
+# The All new things API (tasks manager)
 
 This API allows people to manage their tasks
 
@@ -16,11 +16,7 @@ cd task-expressjs
 ```shell
 npm install 
 ```
-or
 
-```shell
-npm i 
-```
 
 ## Start the server
 
@@ -36,7 +32,7 @@ To start in development mode run:
 npm run dev
 ```
 
-# API V1
+# REST API V1 
 These are the routes you can use:
 
 | Route           | Method  | Params     | Body                                | Description               |
