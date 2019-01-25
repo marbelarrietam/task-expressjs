@@ -32,8 +32,8 @@ To start in development mode run:
 npm run dev
 ```
 
-# REST API V1 
-These are the routes you can use:
+# REST API 
+These are the routes you can use with http://yourdomain:port:
 
 | Route           | Method  | Params     | Body                                | Description               |
 | --------------- | :----:  | ---------: | ----------------------------------- | ------------------------- |
