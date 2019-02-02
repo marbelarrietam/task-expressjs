@@ -42,4 +42,10 @@ These are the routes you can use with http://yourdomain:port:
 | /api/tasks      |  POST   |            | description: string, author: string | Creates a new task        |
 | /api/tasks/{id} |  PUT    | id: number | description: string, author: string | Updates task with Id      |
 | /api/tasks/{id} |  DELETE | id: number |                                     | Deletes task with Id      |
+| /api/users      |  GET    |            |                                     | Gets all users            |
+| /api/users/{id} |  GET    | id: number |                                     | Get user with Id          |
+| /api/users      |  POST   |            | firstname, lastname, email          | Creates a new user        |
+| /api/users/{id} |  PUT    | id: number | firstname, lastname, email          | Updates user with Id      |
+| /api/users/{id} |  DELETE | id: number |                                     | Deletes user with Id      |
+
 
