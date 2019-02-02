@@ -2,6 +2,7 @@ const logger = require.main.require('./server/config/logger');
 const { paginationParseParams } = require.main.require('./server/utils/');
 const { Model, fields } = require('./model');
 
+
 exports.id = (req, res, next, id) => {
   Model.findById(id)
     .exec()
@@ -28,13 +29,17 @@ exports.create = (req, res, next) => {
   const doc = new Model(body);
 
   doc
-  .save()
-  .then((doc) => {
-    res.json(doc);
-  })
-  .catch((err) => {
-    next(new Error(err));
-  });
+    .save()
+    .then(created => {
+      res.status(201);
+      res.json({
+        success: true,
+        item: created,
+      });
+    })
+    .catch(err => {
+      next(new Error(err));
+    });
 };
 
 exports.all = (req, res, next) => {
@@ -43,12 +48,13 @@ exports.all = (req, res, next) => {
 
   const all = Model.find()
     .limit(limit)
-    .skip(skip)
+    .skip(skip);
   const count = Model.countDocuments();
 
   Promise.all([all.exec(), count.exec()])
-    .then(data => {
+    .then((data) => {
       const [docs, total] = data;
+
       const pages = Math.ceil(total / limit);
 
       res.json({
@@ -63,7 +69,7 @@ exports.all = (req, res, next) => {
         },
       });
     })
-    .catch(err => {
+    .catch((err) => {
       next(new Error(err));
     });
 };

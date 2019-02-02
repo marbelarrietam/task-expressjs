@@ -1,37 +1,61 @@
 const express = require('express');
 const requestId = require('express-request-id')();
-const parser = require('body-parser');
+const bodyParser = require('body-parser');
 
-
+const logger = require('./config/logger');
 const api = require('./api/v1');
 
+const database = require('./database');
+
+// Connect to database
+database.connect();
+
+// Init app
 const app = express();
 
+// Setup middleware
 app.use(requestId);
+app.use(logger.requests);
 
-app.use(parser.urlencoded({ extended: false }));
+// Parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+// Parse application/json
+app.use(bodyParser.json());
 
-app.use(parser.json());
-
+// Setup router and routes
 app.use('/api', api);
 app.use('/api/v1', api);
 
+// No route found handler
 app.use((req, res, next) => {
-  res.status(404);
-  res.json({
-    message: 'ERROR: Route not found',
+  next({
+    error: true,
+    message: 'Route not found',
+    statusCode: 404,
+    type: 'warn',
   });
 });
 
+// Error handler
 app.use((err, req, res, next) => {
-    const {
-      statusCode = 500,
-      message,
-    } = err;
-  
-    res.status(statusCode);
-    res.json({
-      message,
-    });
+  const { message = 500, type = 'error' } = err;
+  let { statusCode = 500 } = err;
+  const log = `${logger.header(req)} ${statusCode} ${message}`;
+
+  if (err.message.startsWith('ValidationError')) {
+    statusCode = 422;
+  }
+
+  if (typeof logger[type] === 'function') {
+    logger[type](log);
+  }
+
+  res.status(statusCode);
+  res.json({
+    error: true,
+    statusCode,
+    message,
   });
+});
+
 module.exports = app;
