@@ -1,14 +1,16 @@
 const logger = require.main.require('./server/config/logger');
 const { paginationParseParams } = require.main.require('./server/utils/');
+const { sortParseParams, sortCompactToStr } = require.main.require(
+  './server/utils'
+);
 const { Model, fields } = require('./model');
-
 
 exports.id = (req, res, next, id) => {
   Model.findById(id)
     .exec()
     .then(doc => {
       if (!doc) {
-        const message = `${id} not found`;
+        const message = `${Model.modelName} (${id}) not found`;
 
         res.json({
           success: false,
@@ -44,17 +46,18 @@ exports.create = (req, res, next) => {
 
 exports.all = (req, res, next) => {
   const { query = {} } = req;
-  const { limit, skip, page } = paginationParseParams(query);
+  const { limit, page, skip } = paginationParseParams(query);
+  const { sortBy, direction } = sortParseParams(query, fields);
 
   const all = Model.find()
+    .sort(sortCompactToStr(sortBy, direction))
     .limit(limit)
     .skip(skip);
   const count = Model.countDocuments();
 
   Promise.all([all.exec(), count.exec()])
-    .then((data) => {
+    .then(data => {
       const [docs, total] = data;
-
       const pages = Math.ceil(total / limit);
 
       res.json({
@@ -66,10 +69,12 @@ exports.all = (req, res, next) => {
           total,
           page,
           pages,
+          sortBy,
+          direction,
         },
       });
     })
-    .catch((err) => {
+    .catch(err => {
       next(new Error(err));
     });
 };

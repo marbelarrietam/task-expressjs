@@ -1,5 +1,6 @@
 const express = require('express');
 const requestId = require('express-request-id')();
+const cors = require('cors');
 const bodyParser = require('body-parser');
 
 const logger = require('./config/logger');
@@ -12,6 +13,14 @@ database.connect();
 
 // Init app
 const app = express();
+
+app.use(
+  cors({
+    origin: '*',
+    methods: ['GET', 'PUT', 'POST', 'DELETE'],
+    allowedHeaders: ['Accept', 'Content-Type', 'Authorization'],
+  }),
+);
 
 // Setup middleware
 app.use(requestId);

@@ -1,13 +1,19 @@
-const logger = require.main.require('./server/config/logger');
 const { paginationParseParams } = require.main.require('./server/utils/');
-const { Model, fields } = require('./model');
+const { sortParseParams, sortCompactToStr } = require.main.require(
+  './server/utils'
+);
+const { Model, fields, references } = require('./model');
+
+const referencesNames = Object.getOwnPropertyNames(references);
 
 exports.id = (req, res, next, id) => {
+  const populate = referencesNames.join(' ');
   Model.findById(id)
+    .populate(populate)
     .exec()
     .then(doc => {
       if (!doc) {
-        const message = `${id} not found`;
+        const message = `${Model.modelName} (${id}) not found`;
 
         res.json({
           success: false,
@@ -28,22 +34,30 @@ exports.create = (req, res, next) => {
   const doc = new Model(body);
 
   doc
-  .save()
-  .then((doc) => {
-    res.json(doc);
-  })
-  .catch((err) => {
-    next(new Error(err));
-  });
+    .save()
+    .then(created => {
+      res.status(201);
+      res.json({
+        success: true,
+        item: created,
+      });
+    })
+    .catch(err => {
+      next(new Error(err));
+    });
 };
 
 exports.all = (req, res, next) => {
   const { query = {} } = req;
-  const { limit, skip, page } = paginationParseParams(query);
+  const { limit=10, page, skip } = paginationParseParams(query);
+  const { sortBy, direction } = sortParseParams(query, fields);
+  const populate = referencesNames.join(' ');
 
   const all = Model.find()
+    .sort(sortCompactToStr(sortBy, direction))
     .limit(limit)
     .skip(skip)
+    .populate(populate);
   const count = Model.countDocuments();
 
   Promise.all([all.exec(), count.exec()])
@@ -60,6 +74,8 @@ exports.all = (req, res, next) => {
           total,
           page,
           pages,
+          sortBy,
+          direction,
         },
       });
     })
@@ -108,4 +124,5 @@ exports.delete = (req, res, next) => {
     .catch(err => {
       next(new Error(err));
     });
+
 };

@@ -1,4 +1,3 @@
-
 const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
@@ -7,6 +6,10 @@ const fields = {
   description: {
     type: String,
     required: true,
+    trim: true,
+  },
+  status: {
+    type: Boolean,
     trim: true,
   },
 };
@@ -22,6 +25,7 @@ const references = {
 const task = new Schema(Object.assign(fields, references), {
   timestamps: true,
 });
+
 
 module.exports = {
   Model: mongoose.model('task', task),
