@@ -17,6 +17,14 @@ cd task-expressjs
 npm install 
 ```
 
+In the root folder rename the ".env.example" file to ".env", and change the SERVER_PORT to an available port and set the url, username and password of your MONGODB server, eg:
+
+```shell
+SERVER_PORT=3000
+DATABASE_URL=XXXXXXXXX.XXXXXXXX@XXXXXXXX
+DATABASE_USERNAME=XXXXXXXX
+DATABASE_PASSWORD=XXXXXXXXXXX
+```
 
 ## Start the server
 
@@ -31,6 +39,7 @@ To start in development mode run:
 ```shell
 npm run dev
 ```
+
 
 # REST API 
 These are the routes you can use with http://yourdomain:port:
